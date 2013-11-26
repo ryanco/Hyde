@@ -27,7 +27,7 @@ class Hyde():
 		args = Hyde.process_args(args)
 		if args.sub_command == 'add':
 			Hyde.handle_add(args)
-		elif args.sub_command ==  'draft':
+		elif args.sub_command == 'draft':
 			Hyde.handle_draft(args)
 		else:
 			raise CommandArgumentError("No Valid Sub-Command was specified. Expected 'add' or 'draft'")
@@ -220,7 +220,7 @@ class PageTemplate(object):
 
 
 class Config(object):
-	post_drafts_dir = "_drafts/posts"
+	post_drafts_dir = "_drafts/posts/"
 
 if __name__ == '__main__':# pragma: no cover
 	Hyde.main()

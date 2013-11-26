@@ -63,9 +63,21 @@ class CommandLineTests(unittest.TestCase):
 		self.verify_system_exit(2)
 		TestUtility.clear_sys_args()
 
+	def test_draft_post_no_title(self):
+		TestUtility.clear_sys_args()
+		TestUtility.append_sys_args(["draft", "post"])
+		self.verify_system_exit(2)
+		TestUtility.clear_sys_args()
+
 	def test_add_page_no_title(self):
 		TestUtility.clear_sys_args()
 		TestUtility.append_sys_args(["add", "page"])
+		self.verify_system_exit(2)
+		TestUtility.clear_sys_args()
+
+	def test_draft_page_no_title(self):
+		TestUtility.clear_sys_args()
+		TestUtility.append_sys_args(["draft", "page"])
 		self.verify_system_exit(2)
 		TestUtility.clear_sys_args()
 
@@ -76,11 +88,25 @@ class CommandLineTests(unittest.TestCase):
 		self.assertEqual("post title", args.title)
 		TestUtility.clear_sys_args()
 
+	def test_draft_post_with_title(self):
+		TestUtility.clear_sys_args()
+		TestUtility.append_sys_args(['draft', 'post', 'draft post title'])
+		args = Hyde().process_args()
+		self.assertEqual("draft post title", args.title)
+		TestUtility.clear_sys_args()
+
 	def test_add_page_with_title(self):
 		TestUtility.clear_sys_args()
 		TestUtility.append_sys_args(['add', 'page', 'page title'])
 		args = Hyde().process_args()
 		self.assertEqual("page title", args.title)
+		TestUtility.clear_sys_args()
+
+	def test_draft_page_with_title(self):
+		TestUtility.clear_sys_args()
+		TestUtility.append_sys_args(['draft', 'page', 'draft page title'])
+		args = Hyde().process_args()
+		self.assertEqual("draft page title", args.title)
 		TestUtility.clear_sys_args()
 
 	def verify_system_exit(self, exit_code):
