@@ -12,8 +12,8 @@ class JekyllPostTest(unittest.TestCase):
 	"""
 	def test_handle_add_post(self):
 		post_title = 'a test title'
-		Hyde.handle_add_post(post_title)
 		path = '_posts/'
+		Hyde.handle_add_post(post_title, path)
 		actual_title = TestUtility.build_jekyll_post_title('a-test-title') + '.md'
 		actual_file = path + actual_title
 		self.assertTrue(os.path.exists(path))

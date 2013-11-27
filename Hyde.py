@@ -2,15 +2,18 @@
 import argparse
 import datetime
 import os
+import copy
 
 
-class CommandArgumentError(Exception):
-	def __init__(self, msg):
-		self.msg = msg
-
-class DuplicatePostError(Exception):
-	def __init__(self, msg):
-		self.msg = msg
+class Config(object):
+	#POST CONFIGURATION
+	posts_dir = '_posts/'
+	post_drafts_dir = '_drafts/posts/'
+	post_extension = '.md'
+	post_template = ['---\n', 'layout: %layout_type%\n', 'title: %post_title%\n', 'date: %post_date%\n', '---\n']
+	#PAGE CONFIGURATION
+	new_page_file_name = 'index.md'
+	page_template = ['---\n', 'layout: %layout_type%\n', 'title: %page_title%\n', '---\n']
 
 
 class Hyde():
@@ -99,7 +102,7 @@ class Hyde():
 			CommandArgumentError("The 'draft' sub-command requires a 'post'  or 'page' argument")
 
 	@staticmethod
-	def handle_add_post(title, directory="_posts/"):
+	def handle_add_post(title, directory=Config.posts_dir):
 		"""
 		Creates a Jekyll post using the naming convention and template for Jekyll.
 		Writes the files in the configured posts directory.
@@ -107,12 +110,12 @@ class Hyde():
 		"""
 		post_file_title = Hyde.create_jekyll_post_title(title)
 		posts_directory = directory
-		post_extension = '.md'
-		post_template = 'post'
+		post_extension = Config.post_extension
 		post_file_name = post_file_title + post_extension
-		if Hyde.__does_file_exist(posts_directory+post_file_name):
-			raise DuplicatePostError("The file "+posts_directory+post_file_name+" already exists. Nothing Created.")
-		post_template = Hyde.get_template(post_template)
+		if Hyde.__does_file_exist(posts_directory + post_file_name):
+			raise DuplicatePostError("The file " + posts_directory + post_file_name + " already exists. Nothing Created.")
+		#create a copy of the template as we are going to customize it.
+		post_template = copy.copy(Config.post_template)
 		custom_settings = {'%post_title%': title, '%post_date%': str(datetime.date.today()), '%layout_type%': 'post'}
 		post_template_content = Hyde.customize_template(custom_settings, post_template)
 		Hyde.__write_jekyll_file(posts_directory, post_file_name, post_template_content)
@@ -122,16 +125,15 @@ class Hyde():
 		"""
 		Creates a new page as a directory with an index page. If the page already exists adds a new page with the
 		title provided under the existing directory.
-		@param title: the title for the page.
+		@param page_name: the name for the page.
 		"""
-		page_template = 'page'
 		page_path = page_name + '/'
-		page_file_name = 'index.md'
-		page_template = Hyde.get_template(page_template)
+		page_file_name = Config.new_page_file_name
+		#create a copy of the template as we are going to customize it.
+		page_template = copy.copy(Config.page_template)
 		custom_settings = {'%page_title%': page_name, '%layout_type%': 'page'}
 		post_template_content = Hyde.customize_template(custom_settings, page_template)
 		Hyde.__write_jekyll_file(page_path, page_file_name, post_template_content)
-
 
 	@staticmethod
 	def create_jekyll_post_title(title):
@@ -148,7 +150,7 @@ class Hyde():
 	@staticmethod
 	def __write_jekyll_file(file_path, file_name, content):
 		Hyde.__create_output_directory(file_path)
-		with open(file_path+file_name, "w+") as outfile:
+		with open(file_path + file_name, "w+") as outfile:
 			for line in content:
 				outfile.write(line)
 
@@ -165,15 +167,6 @@ class Hyde():
 			os.makedirs(path)
 
 	@staticmethod
-	def get_template(template_name):
-		if template_name == 'post':
-			return PostTemplate.get_template()
-		if template_name == 'page':
-			return PageTemplate.get_template()
-
-		return PostTemplate.get_template()
-
-	@staticmethod
 	def customize_template(custom_values, template):
 		"""
 		Customizes the template using the passed in custom values dictionary.
@@ -188,40 +181,15 @@ class Hyde():
 		return template
 
 
-class PostTemplate(object):
-
-	@staticmethod
-	def get_template():
-		"""
-		Returns the post template values as a list.
-		@return: list of post template values.
-		"""
-		post_template = ['---\n',
-			'layout: %layout_type%\n',
-			'title: %post_title%\n',
-			'date: %post_date%\n',
-			'---\n']
-		return post_template
+class CommandArgumentError(Exception):
+	def __init__(self, msg):
+		self.msg = msg
 
 
-class PageTemplate(object):
-
-	@staticmethod
-	def get_template():
-		"""
-		Returns the post template values as a list.
-		@return: list of post template values.
-		"""
-		page_template = ['---\n',
-			'layout: %layout_type%\n',
-			'title: %page_title%\n',
-			'---\n']
-		return page_template
+class DuplicatePostError(Exception):
+	def __init__(self, msg):
+		self.msg = msg
 
 
-class Config(object):
-	post_drafts_dir = "_drafts/posts/"
-
-if __name__ == '__main__':# pragma: no cover
+if __name__ == '__main__':  # pragma: no cover
 	Hyde.main()
-

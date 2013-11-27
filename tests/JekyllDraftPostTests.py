@@ -29,30 +29,33 @@ class JekyllPostTest(unittest.TestCase):
 		self.assertFalse(os.path.exists(path))
 		self.assertFalse(os.path.exists(draft_root))
 
-	#def test_handle_add_duplicate_draft_post(self):
-	#	post_title = 'a draft title'
-	#	Hyde.handle_add_post(post_title)
-	#	path = '_drafts/posts/'
-	#	actual_title = TestUtility.build_jekyll_post_title('a-draft-title') + '.md'
-	#	actual_file = path + actual_title
-	#	self.assertTrue(os.path.exists(path))
-	#	self.assertTrue(os.path.isfile(actual_file))
-	#	with self.assertRaises(DuplicatePostError) as err:
-	#		Hyde.handle_add_post(post_title)
-	#
-	#	self.assertEqual("The file "+path+actual_title+" already exists. Nothing Created.", err.exception.msg)
-	#	TestUtility.remove_file(actual_file)
-	#	self.assertFalse(os.path.isfile(actual_file))
-	#	TestUtility.remove_directory(path)
-	#	self.assertFalse(os.path.exists(path))
-	#
-	#def test_create_jekyll_post_title(self):
-	#	"""
-	#	Tests the creation of Jekyll post title using the Jekyll format.
-	#	"""
-	#	actual_title = Hyde.create_jekyll_post_title('title for this unit test')
-	#	expected_title = TestUtility.build_jekyll_post_title('title-for-this-unit-test')
-	#	self.assertEquals(expected_title, actual_title)
+	def test_handle_add_duplicate_draft_post(self):
+		post_title = 'a draft title'
+		draft_root = '_drafts/'
+		path = draft_root + '/posts/'
+		Hyde.handle_add_post(post_title, path)
+		actual_title = TestUtility.build_jekyll_post_title('a-draft-title') + '.md'
+		actual_file = path + actual_title
+		self.assertTrue(os.path.exists(path))
+		self.assertTrue(os.path.isfile(actual_file))
+		with self.assertRaises(DuplicatePostError) as err:
+			Hyde.handle_add_post(post_title, path)
+
+		self.assertEqual("The file "+path+actual_title+" already exists. Nothing Created.", err.exception.msg)
+		TestUtility.remove_file(actual_file)
+		self.assertFalse(os.path.isfile(actual_file))
+		TestUtility.remove_directory(path)
+		TestUtility.remove_directory(draft_root)
+		self.assertFalse(os.path.exists(path))
+		self.assertFalse(os.path.exists(draft_root))
+
+	def test_create_jekyll_draft_post_title(self):
+		"""
+		Tests the creation of Jekyll draft post title using the Jekyll format.
+		"""
+		actual_title = Hyde.create_jekyll_post_title('title for this unit test')
+		expected_title = TestUtility.build_jekyll_post_title('title-for-this-unit-test')
+		self.assertEquals(expected_title, actual_title)
 
 	@staticmethod
 	def get_expected_post_contents(post_title):

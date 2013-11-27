@@ -80,7 +80,7 @@ class HydeMainTests(unittest.TestCase):
 		self.assertFalse(os.path.isfile(page_file))
 		TestUtility.remove_directory(path)
 		self.assertFalse(os.path.exists(path))
-	
+
 	def verify_system_exit(self, args, exit_code):
 		with self.assertRaises(SystemExit) as cm:
 			Hyde().main(args)
