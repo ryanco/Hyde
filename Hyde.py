@@ -131,6 +131,8 @@ class Hyde():
 		title provided under the existing directory.
 		@param page_name: the name for the page.
 		"""
+		if page_name is None:
+			raise CommandArgumentError("The page name cannot be None. Please provide a page name.")
 		page_path = page_name + '/'
 		page_file_name = Config.new_page_file_name
 		#create a copy of the template as we are going to customize it.
