@@ -13,7 +13,7 @@ class JekyllPageTest(unittest.TestCase):
 		"""
 		page_name = 'TestPage'
 		actual_file_name = 'index.md'
-		Hyde.handle_add_page(page_name)
+		Hyde._handle_add_page(page_name)
 		actual_file = page_name + '/' + actual_file_name
 		self.assertTrue(os.path.exists(page_name))
 		self.assertTrue(os.path.isfile(actual_file))
@@ -33,11 +33,11 @@ class JekyllPageTest(unittest.TestCase):
 		"""
 		page_name = 'TestPage'
 		actual_file_name = 'index.md'
-		Hyde.handle_add_page(page_name)
+		Hyde._handle_add_page(page_name)
 		actual_file = page_name + '/' + actual_file_name
 		self.assertTrue(os.path.exists(page_name))
 		self.assertTrue(os.path.isfile(actual_file))
-		Hyde.handle_add_page(page_name)
+		Hyde._handle_add_page(page_name)
 		self.assertTrue(os.path.exists(page_name))
 		self.assertTrue(os.path.isfile(actual_file))
 
@@ -46,7 +46,7 @@ class JekyllPageTest(unittest.TestCase):
 	def get_expected_page_contents(page_name):
 		"""
 		Creates a post template list for testing.
-		@param post_title: the title of the post.
+		@param page_name: the name of the page.
 		@return: the expected post template list.
 		"""
 		expected_page = ['---\n',
@@ -60,7 +60,7 @@ class JekyllPageTest(unittest.TestCase):
 	def get_actual_page_contents(page_file):
 		"""
 		Reads and returns the contents of a post file.
-		@param post_file: the post file to read.
+		@param page_file: the page file to read.
 		@return: post file contents as a list of lines.
 		"""
 		with open(page_file) as post_file:

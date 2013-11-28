@@ -14,7 +14,7 @@ class JekyllPostTest(unittest.TestCase):
 		post_title = 'a draft title'
 		draft_root = '_drafts/'
 		path = draft_root + 'posts/'
-		Hyde.handle_add_post(post_title, path)
+		Hyde._handle_add_post(post_title, path)
 		actual_title = TestUtility.build_jekyll_post_title('a-draft-title') + '.md'
 		actual_file = path + actual_title
 		self.assertTrue(os.path.exists(path))
@@ -33,13 +33,13 @@ class JekyllPostTest(unittest.TestCase):
 		post_title = 'a draft title'
 		draft_root = '_drafts/'
 		path = draft_root + '/posts/'
-		Hyde.handle_add_post(post_title, path)
+		Hyde._handle_add_post(post_title, path)
 		actual_title = TestUtility.build_jekyll_post_title('a-draft-title') + '.md'
 		actual_file = path + actual_title
 		self.assertTrue(os.path.exists(path))
 		self.assertTrue(os.path.isfile(actual_file))
 		with self.assertRaises(DuplicatePostError) as err:
-			Hyde.handle_add_post(post_title, path)
+			Hyde._handle_add_post(post_title, path)
 
 		self.assertEqual("The file "+path+actual_title+" already exists. Nothing Created.", err.exception.msg)
 		TestUtility.remove_file(actual_file)

@@ -11,6 +11,7 @@ class Config(object):
 	post_drafts_dir = '_drafts/posts/'
 	post_extension = '.md'
 	post_template = ['---\n', 'layout: %layout_type%\n', 'title: %post_title%\n', 'date: %post_date%\n', '---\n']
+
 	#PAGE CONFIGURATION
 	new_page_file_name = 'index.md'
 	page_template = ['---\n', 'layout: %layout_type%\n', 'title: %page_title%\n', '---\n']
@@ -68,15 +69,21 @@ class Hyde():
 
 	@staticmethod
 	def handle_sub_command(args):
+		"""
+		Handles the first level sub-command and routes it to the
+		matching sub-handler.
+		@param args: arguments passed in from the command line or caller.
+		@raise CommandArgumentError: argument exception if the sub_command is missing or invalid.
+		"""
 		if args.sub_command == 'add':
-			Hyde.handle_add(args)
+			Hyde._handle_add(args)
 		elif args.sub_command == 'draft':
-			Hyde.handle_draft(args)
+			Hyde._handle_draft(args)
 		else:
 			raise CommandArgumentError("No Valid Sub-Command was specified. Expected 'add' or 'draft'")
 
 	@staticmethod
-	def handle_add(args):
+	def _handle_add(args):
 		"""
 		Handle the add sub-command. Determines the item type to add and
 		calls the appropriate handler for it.
@@ -84,14 +91,14 @@ class Hyde():
 		They should contain the "add_item_type" attribute.
 		"""
 		if args.add_item_type == 'post':
-			Hyde.handle_add_post(args.title)
+			Hyde._handle_add_post(args.title)
 		elif args.add_item_type == 'page':
-			Hyde.handle_add_page(args.title)
+			Hyde._handle_add_page(args.title)
 		else:
 			raise CommandArgumentError("The 'add' sub-command requires a 'post'  or 'page' argument")
 
 	@staticmethod
-	def handle_draft(args):
+	def _handle_draft(args):
 		"""
 		Handle the draft sub-command. Determines the item type to create a draft for and
 		calls the appropriate handler for it.
@@ -99,14 +106,14 @@ class Hyde():
 		They should contain the "draft_item_type" attribute.
 		"""
 		if args.draft_item_type == 'post':
-			Hyde.handle_add_post(args.title, Config.post_drafts_dir)
+			Hyde._handle_add_post(args.title, Config.post_drafts_dir)
 		elif args.draft_item_type == 'page':
-			Hyde.handle_add_page(args.title)
+			Hyde._handle_add_page(args.title)
 		else:
 			raise CommandArgumentError("The 'draft' sub-command requires a 'post'  or 'page' argument")
 
 	@staticmethod
-	def handle_add_post(title, directory=Config.posts_dir):
+	def _handle_add_post(title, directory=Config.posts_dir):
 		"""
 		Creates a Jekyll post using the naming convention and template for Jekyll.
 		Writes the files in the configured posts directory.
@@ -116,16 +123,16 @@ class Hyde():
 		posts_directory = directory
 		post_extension = Config.post_extension
 		post_file_name = post_file_title + post_extension
-		if Hyde.__does_file_exist(posts_directory + post_file_name):
+		if Hyde._does_file_exist(posts_directory + post_file_name):
 			raise DuplicatePostError("The file " + posts_directory + post_file_name + " already exists. Nothing Created.")
 		#create a copy of the template as we are going to customize it.
 		post_template = copy.copy(Config.post_template)
 		custom_settings = {'%post_title%': title, '%post_date%': str(datetime.date.today()), '%layout_type%': 'post'}
 		post_template_content = Hyde.customize_template(custom_settings, post_template)
-		Hyde.__write_jekyll_file(posts_directory, post_file_name, post_template_content)
+		Hyde._write_jekyll_file(posts_directory, post_file_name, post_template_content)
 
 	@staticmethod
-	def handle_add_page(page_name):
+	def _handle_add_page(page_name):
 		"""
 		Creates a new page as a directory with an index page. If the page already exists adds a new page with the
 		title provided under the existing directory.
@@ -139,7 +146,7 @@ class Hyde():
 		page_template = copy.copy(Config.page_template)
 		custom_settings = {'%page_title%': page_name, '%layout_type%': 'page'}
 		post_template_content = Hyde.customize_template(custom_settings, page_template)
-		Hyde.__write_jekyll_file(page_path, page_file_name, post_template_content)
+		Hyde._write_jekyll_file(page_path, page_file_name, post_template_content)
 
 	@staticmethod
 	def create_jekyll_post_title(title):
@@ -156,21 +163,21 @@ class Hyde():
 		return date.strftime('%Y-%m-%d-' + author_title)
 
 	@staticmethod
-	def __write_jekyll_file(file_path, file_name, content):
-		Hyde.__create_output_directory(file_path)
+	def _write_jekyll_file(file_path, file_name, content):
+		Hyde._create_output_directory(file_path)
 		with open(file_path + file_name, "w+") as outfile:
 			for line in content:
 				outfile.write(line)
 
 	@staticmethod
-	def __does_file_exist(file_path_and_name):
+	def _does_file_exist(file_path_and_name):
 		if os.path.isfile(file_path_and_name):
 			return True
 
 		return False
 
 	@staticmethod
-	def __create_output_directory(path):
+	def _create_output_directory(path):
 		if not os.path.exists(path):
 			os.makedirs(path)
 
