@@ -10,6 +10,7 @@ class JekyllPostTest(unittest.TestCase):
 	Tests adding a post and ensures the file is created.
 	Then cleans up the file and the directory.
 	"""
+
 	def test_handle_add_post(self):
 		post_title = 'a test title'
 		path = '_posts/'
@@ -37,7 +38,7 @@ class JekyllPostTest(unittest.TestCase):
 		with self.assertRaises(DuplicatePostError) as err:
 			Hyde.handle_add_post(post_title)
 
-		self.assertEqual("The file "+path+actual_title+" already exists. Nothing Created.", err.exception.msg)
+		self.assertEqual("The file " + path + actual_title + " already exists. Nothing Created.", err.exception.msg)
 		TestUtility.remove_file(actual_file)
 		self.assertFalse(os.path.isfile(actual_file))
 		TestUtility.remove_directory(path)
@@ -58,11 +59,8 @@ class JekyllPostTest(unittest.TestCase):
 		@param post_title: the title of the post.
 		@return: the expected post template list.
 		"""
-		expected_post = ['---\n',
-			'layout: post\n',
-			'title: ' + post_title + '\n',
-			'date: ' + str(datetime.date.today()) + '\n',
-			'---\n']
+		expected_post = ['---\n', 'layout: post\n', 'title: ' + post_title + '\n',
+						 'date: ' + str(datetime.date.today()) + '\n', '---\n']
 
 		return expected_post
 
@@ -78,5 +76,6 @@ class JekyllPostTest(unittest.TestCase):
 
 		return actual_file
 
-if __name__ == '__main__':# pragma: no cover
+
+if __name__ == '__main__':  # pragma: no cover
 	unittest.main()

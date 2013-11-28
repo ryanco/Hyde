@@ -28,12 +28,7 @@ class Hyde():
 		@raise MyArgumentError:
 		"""
 		args = Hyde.process_args(args)
-		if args.sub_command == 'add':
-			Hyde.handle_add(args)
-		elif args.sub_command == 'draft':
-			Hyde.handle_draft(args)
-		else:
-			raise CommandArgumentError("No Valid Sub-Command was specified. Expected 'add' or 'draft'")
+		Hyde.handle_sub_command(args)
 
 	@staticmethod
 	def process_args(args=None):
@@ -72,6 +67,15 @@ class Hyde():
 		return args
 
 	@staticmethod
+	def handle_sub_command(args):
+		if args.sub_command == 'add':
+			Hyde.handle_add(args)
+		elif args.sub_command == 'draft':
+			Hyde.handle_draft(args)
+		else:
+			raise CommandArgumentError("No Valid Sub-Command was specified. Expected 'add' or 'draft'")
+
+	@staticmethod
 	def handle_add(args):
 		"""
 		Handle the add sub-command. Determines the item type to add and
@@ -84,7 +88,7 @@ class Hyde():
 		elif args.add_item_type == 'page':
 			Hyde.handle_add_page(args.title)
 		else:
-			CommandArgumentError("The 'add' sub-command requires a 'post'  or 'page' argument")
+			raise CommandArgumentError("The 'add' sub-command requires a 'post'  or 'page' argument")
 
 	@staticmethod
 	def handle_draft(args):
@@ -99,7 +103,7 @@ class Hyde():
 		elif args.draft_item_type == 'page':
 			Hyde.handle_add_page(args.title)
 		else:
-			CommandArgumentError("The 'draft' sub-command requires a 'post'  or 'page' argument")
+			raise CommandArgumentError("The 'draft' sub-command requires a 'post'  or 'page' argument")
 
 	@staticmethod
 	def handle_add_post(title, directory=Config.posts_dir):
@@ -143,6 +147,8 @@ class Hyde():
 		@param title: The textual title for the post. (What you expect the user to see on the site).
 		@return: the formatted title name following the convention described here: http://jekyllrb.com/docs/posts/
 		"""
+		if title is None:
+			raise CommandArgumentError("The title cannot be None. Please provide a title.")
 		author_title = title.replace(' ', '-').lower()
 		date = datetime.date.today()
 		return date.strftime('%Y-%m-%d-' + author_title)
