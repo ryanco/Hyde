@@ -116,5 +116,5 @@ class CommandLineTests(unittest.TestCase):
 		self.assertEqual(cm.exception.code, exit_code)
 
 
-if __name__ == '__main__':# pragma: no cover
+if __name__ == '__main__':  # pragma: no cover
 	unittest.main()

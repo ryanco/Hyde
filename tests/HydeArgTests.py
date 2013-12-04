@@ -2,12 +2,12 @@ import unittest
 import os
 import shutil
 from Hyde import Hyde, CommandArgumentError
-from TestUtility import TestUtility
+from TestUtility import TestUtility, MockArguments
 
 
 class HydeMainTests(unittest.TestCase):
 
-	NO_VALID_SUB_COMMAND = "No Valid Sub-Command was specified. Expected 'add' or 'draft'"
+	NO_VALID_SUB_COMMAND = "No Valid Sub-Command was specified. Expected 'add', 'draft', or 'publish'"
 	ADD_MISSING_ARGUMENT = "The 'add' sub-command requires a 'post'  or 'page' argument"
 	DRAFT_MISSING_ARGUMENT = "The 'draft' sub-command requires a 'post'  or 'page' argument"
 	MISSING_TITLE = "The title cannot be None. Please provide a title."
@@ -109,14 +109,12 @@ class HydeMainTests(unittest.TestCase):
 		TestUtility.remove_directory(path)
 		self.assertFalse(os.path.exists(path))
 
-
-class MockArguments(object):
-	def __init__(self, sub_command=None, add_item_type=None, draft_item_type=None, title=None):
-		self.sub_command = sub_command
-		self.add_item_type = add_item_type
-		self.draft_item_type = draft_item_type
-		self.title = title
-
+	def test_process_args_with_args(self):
+		input_args = ['add', 'page', "RealPage"]
+		args = Hyde.process_args(input_args)
+		self.assertEqual(args.sub_command, 'add')
+		self.assertEqual(args.add_item_type, 'page')
+		self.assertEqual(args.title, "RealPage")
 
 if __name__ == '__main__': # pragma: no cover
 	unittest.main()

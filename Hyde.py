@@ -6,16 +6,18 @@ import copy
 
 
 class Config(object):
+	#DRAFT CONFIG
+	drafts_dir="_drafts/"
+
 	#POST CONFIGURATION
 	posts_dir = '_posts/'
-	post_drafts_dir = '_drafts/posts/'
+	posts_drafts_dir = drafts_dir+'posts/'
 	post_extension = '.md'
 	post_template = ['---\n', 'layout: %layout_type%\n', 'title: %post_title%\n', 'date: %post_date%\n', '---\n']
 
 	#PAGE CONFIGURATION
 	new_page_file_name = 'index.md'
 	page_template = ['---\n', 'layout: %layout_type%\n', 'title: %page_title%\n', '---\n']
-
 
 class Hyde():
 	def __init__(self):
@@ -44,6 +46,9 @@ class Hyde():
 
 		add_command = subparsers.add_parser('add')
 		draft_command = subparsers.add_parser('draft')
+		publish_command = subparsers.add_parser('publish')
+		publish_command.add_argument('title', help='Specify a title for a draft Jekyll post to publish. '
+												   'The full post name with date is not required.')
 
 		add_command_subparsers = add_command.add_subparsers(dest='add_item_type')
 		draft_command_subparsers = draft_command.add_subparsers(dest='draft_item_type')
@@ -54,7 +59,7 @@ class Hyde():
 		draft_post = draft_command_subparsers.add_parser('post', help='Create a draft Jekyll post.')
 		draft_post.add_argument('title', help='Specify a title for a draft Jekyll post.')
 
-		# create the parser for the "post" command
+		# create the parser for the "page" command
 		add_page = add_command_subparsers.add_parser('page', help='Create a new Jekyll page.')
 		add_page.add_argument('title', help='Specify a title for a new Jekyll page.')
 		draft_page = draft_command_subparsers.add_parser('page', help='Create a draft Jekyll page.')
@@ -79,8 +84,10 @@ class Hyde():
 			Hyde._handle_add(args)
 		elif args.sub_command == 'draft':
 			Hyde._handle_draft(args)
+		elif args.sub_command == 'publish':
+			Hyde._handle_publish(args)
 		else:
-			raise CommandArgumentError("No Valid Sub-Command was specified. Expected 'add' or 'draft'")
+			raise CommandArgumentError("No Valid Sub-Command was specified. Expected 'add', 'draft', or 'publish'")
 
 	@staticmethod
 	def _handle_add(args):
@@ -106,11 +113,36 @@ class Hyde():
 		They should contain the "draft_item_type" attribute.
 		"""
 		if args.draft_item_type == 'post':
-			Hyde._handle_add_post(args.title, Config.post_drafts_dir)
+			Hyde._handle_add_post(args.title, Config.posts_drafts_dir)
 		elif args.draft_item_type == 'page':
 			Hyde._handle_add_page(args.title)
 		else:
 			raise CommandArgumentError("The 'draft' sub-command requires a 'post'  or 'page' argument")
+
+
+	@staticmethod
+	def _handle_publish(args):
+		"""
+		Handle the publish sub-command. Attempts to find a draft matching the title provided
+		and moves it to the posts directory.
+		@param args: arguments passed into from the command line or caller.
+		They should contain the "title" attribute.
+		"""
+		if not args.title:
+			raise CommandArgumentError("The 'publish' sub-command requires a title.")
+
+		if not os.path.exists(Config.posts_drafts_dir):
+			raise CommandArgumentError("The drafts directory %s does not exist."%Config.posts_drafts_dir)
+
+		search_title = Hyde._create_jekyll_title(args.title)
+		draft_post_files = os.listdir(Config.posts_drafts_dir)
+		for post_file in draft_post_files:
+			if search_title in post_file:
+				os.rename(Config.posts_drafts_dir+post_file, Config.posts_dir+post_file)
+				break
+		else:
+			raise CommandArgumentError("No draft found with '%s' in the title." % search_title)
+
 
 	@staticmethod
 	def _handle_add_post(title, directory=Config.posts_dir):
@@ -123,7 +155,7 @@ class Hyde():
 		posts_directory = directory
 		post_extension = Config.post_extension
 		post_file_name = post_file_title + post_extension
-		if Hyde._does_file_exist(posts_directory + post_file_name):
+		if os.path.isfile(posts_directory + post_file_name):
 			raise DuplicatePostError("The file " + posts_directory + post_file_name + " already exists. Nothing Created.")
 		#create a copy of the template as we are going to customize it.
 		post_template = copy.copy(Config.post_template)
@@ -156,11 +188,20 @@ class Hyde():
 		@param title: The textual title for the post. (What you expect the user to see on the site).
 		@return: the formatted title name following the convention described here: http://jekyllrb.com/docs/posts/
 		"""
-		if title is None:
-			raise CommandArgumentError("The title cannot be None. Please provide a title.")
-		author_title = title.replace(' ', '-').lower()
 		date = datetime.date.today()
-		return date.strftime('%Y-%m-%d-' + author_title)
+		return date.strftime('%Y-%m-%d-' + Hyde._create_jekyll_title(title))
+
+	@staticmethod
+	def _create_jekyll_title(title):
+		"""
+		Replaces spaces in a title with dashes. Also ensure the title is not None.
+		@param title:
+		@return:
+		"""
+		if not title:
+			raise CommandArgumentError("The title cannot be None. Please provide a title.")
+		return title.replace(' ', '-')
+
 
 	@staticmethod
 	def _write_jekyll_file(file_path, file_name, content):
@@ -168,13 +209,6 @@ class Hyde():
 		with open(file_path + file_name, "w+") as outfile:
 			for line in content:
 				outfile.write(line)
-
-	@staticmethod
-	def _does_file_exist(file_path_and_name):
-		if os.path.isfile(file_path_and_name):
-			return True
-
-		return False
 
 	@staticmethod
 	def _create_output_directory(path):

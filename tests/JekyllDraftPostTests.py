@@ -5,7 +5,7 @@ from Hyde import Hyde, DuplicatePostError
 from TestUtility import TestUtility
 
 
-class JekyllPostTest(unittest.TestCase):
+class JekyllPostTest(unittest.TestCase, Hyde):
 	"""
 	Tests adding a post and ensures the file is created.
 	Then cleans up the file and the directory.

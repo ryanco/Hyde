@@ -47,4 +47,10 @@ class TestUtility:
 		shutil.rmtree(path)
 
 
+class MockArguments(object):
+	def __init__(self, sub_command=None, add_item_type=None, draft_item_type=None, title=None):
+		self.sub_command = sub_command
+		self.add_item_type = add_item_type
+		self.draft_item_type = draft_item_type
+		self.title = title
 

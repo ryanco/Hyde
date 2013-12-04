@@ -7,7 +7,7 @@ class ConfigTests(unittest.TestCase):
 		self.assertEqual("_posts/", Config.posts_dir)
 
 	def test_posts_drafts_dir_default(self):
-		self.assertEqual("_drafts/posts/", Config.post_drafts_dir)
+		self.assertEqual("_drafts/posts/", Config.posts_drafts_dir)
 
 	def test_posts_extension_default(self):
 		self.assertEqual(".md", Config.post_extension)
