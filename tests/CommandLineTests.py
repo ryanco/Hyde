@@ -109,6 +109,12 @@ class CommandLineTests(unittest.TestCase):
 		self.assertEqual("draft page title", args.title)
 		TestUtility.clear_sys_args()
 
+	def test_short_version_option(self):
+		TestUtility.clear_sys_args()
+		TestUtility.append_sys_args(['-v'])
+		self.verify_system_exit(0)
+		TestUtility.clear_sys_args()
+
 	def verify_system_exit(self, exit_code):
 		with self.assertRaises(SystemExit) as cm:
 			monkey = Hyde()
